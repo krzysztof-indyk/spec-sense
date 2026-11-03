@@ -78,3 +78,38 @@ inspect, explain that and obtain consent first. Do not claim a hook ran if it di
 
 Keep messages short: one relevant context sentence or brief trade-off, followed by
 one question. Avoid status narration, gratuitous matrices and multi-question dumps.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Capture
+
+- Keep decisions in chat until final write approval. Save current-stage decisions
+  canonically. Use exactly one `## Pending Handoffs` section in active `spec.md`
+  for genuinely later-stage decisions; preserve existing entries and requirements.
+- Format: `- **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After for HTTP 429. Approved during speckit.specify.`
+  Retain full meaning, qualifiers, approval provenance and a native destination.
+  Check existing feature IDs; keep IDs stable and never reuse an unfinished ID.
+  Resolve ambiguous identity/targets before writing; never invent destinations.
+- Preview exact entries in final approval. Rejection means no writes. After the
+  authorized native write, verify every new approved decision in canonical or
+  pending text. Report incomplete persistence if missing; preserve unrelated text.
+- Keep product WHAT/WHY separate from temporary technical entries. Run native
+  checks; surface conflicts with the spec checker; do not bypass validation.

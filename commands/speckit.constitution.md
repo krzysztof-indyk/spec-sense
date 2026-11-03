@@ -95,3 +95,32 @@ standard templates or feature artifacts as a side effect of constitution updates
 Be concise. One principle or one decision per turn, with **one question**. Do not
 present a multi-question constitution checklist. Preserve the full standard
 constitution file and governance conventions after approval.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Governance boundary
+
+- Reuse approved constraints; do not treat feature choices as ratified governance.
+  Never put feature-specific handoffs or pending sections in the constitution.
+- The only writable file remains `.specify/memory/constitution.md`. Preserve
+  principle/final approvals; verify governance changes in canonical text.
+- Never transfer/clean feature entries. Label out-of-scope decisions unpersisted;
+  recommend a separate permitted workflow without invoking it.

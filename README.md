@@ -1,4 +1,8 @@
-# SpecSense v0.5.4 — Standard Spec Kit + GitHub Copilot
+# SpecSense v0.6.0 — Decision Handoff
+
+**Candidate package: real Spec Kit + Copilot acceptance testing is still pending.**
+See [validation results](docs/validation-results.md) before treating this as a
+completed release.
 
 **Unofficial** Spec Kit preset inspired by [sermakarevich/sddw](https://github.com/sermakarevich/sddw).
 It adapts **how Spec Kit collaborates with the user**; it does **not** replace Spec Kit's standard process, templates, scripts, or artifact formats. No Lean dependency.
@@ -39,6 +43,13 @@ artifact structure.
 - The native `speckit.*` command names stay unchanged for compatibility with standard Spec Kit.
 
 ## Release notes
+
+**v0.6.0 — Decision Handoff:** ask once, decide once, carry decisions forward.
+All eight wrappers reuse approved decisions from native artifacts. Future-stage
+decisions are saved only at the current stage's final approved write. The
+approved plan-only bounded cleanup exception removes matching temporary entries
+from active `spec.md` only after verified persistence in native planning output.
+See [CHANGELOG.md](CHANGELOG.md).
 
 **v0.5.4 — naming consistency:** renamed the source/archive root and preset ID
 from the historical unhyphenated identifier to **`spec-sense`**, while keeping
@@ -91,6 +102,60 @@ copyright notices and review any applicable additional licenses.
 Other Spec Kit commands, including `implement`, and all artifact **templates** are unmodified.
 
 ## Interactive workflow details
+
+### Decision Handoff across stages
+
+Generated commands keep native core instructions first, followed by the existing
+interactive policy. Concise Decision Handoff instructions appear last.
+
+Before asking, each command reads relevant native artifacts and distinguishes
+approved, open, conflicting and out-of-scope decisions. It reopens a decision
+only for missing details, material contradictions or new risks, explaining what
+changed. Existing final write approvals cover handoffs; there is no extra
+approval merely to carry an unchanged decision forward.
+
+`specify` and `clarify` keep product requirements in their canonical sections.
+An explicitly approved decision whose destination belongs to a later stage can
+be saved in one temporary section of `spec.md` at final approved writing:
+
+```markdown
+## Pending Handoffs
+
+- **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After for HTTP 429, with at most three retries. Approved during speckit.specify.
+```
+
+The entry retains its approved meaning, qualifiers, stable feature-scoped ID
+and destination. Suggestions are not approvals. `clarify` preserves later-stage
+entries. `plan` consumes approved planning decisions without repeating questions,
+saves them in canonical native output and re-reads that output to verify them.
+
+**Approved plan-only bounded cleanup exception:** the existing final plan
+approval must disclose cleanup of the matching pending IDs. After verifying the
+destination, `plan` rechecks active-feature identity and the source, removes only
+unchanged, verified plan-targeted entries from active `spec.md`, then verifies
+both files again. Permanent requirements, Clarifications, metadata and unrelated
+entries remain intact. An empty pending heading is removed. Ambiguity or changed
+source blocks deletion; failed destination verification preserves the source.
+Retries verify existing output without duplicating decisions. Failed cleanup is
+reported as incomplete, even when the destination was saved successfully.
+
+New later-stage decisions from planning may be recorded in `plan.md`; subsequent
+commands can reuse them but have no new permission to clean that source. Report
+pending cleanup rather than extending the exception. `tasks` keeps native task
+formatting; `analyze` stays strictly read-only; `converge` remains append-only;
+custom checklists cannot be rewritten; constitution writes stay governance-only.
+Do not use tasks, checklists or the constitution as feature decision registries.
+New decisions outside a command's write scope are explicitly **unpersisted** and
+require a separate permitted workflow, which is never automatically invoked.
+
+Adoption is forward-only: no historical migration, new registry, extra command,
+core template change or helper runtime. Standard validation still runs; a
+temporary technical section conflicting with native spec quality rules must be
+reported, not silently accepted. These are model instructions, **not atomic
+transactions or guaranteed enforcement**. See the approved
+[requirements](docs/decision-handoff-requirements.md),
+[technical design](docs/decision-handoff-technical-design.md) and
+[test plan](docs/decision-handoff-test-plan.md).
 
 ### `speckit.converge` — approve groups of gaps
 
@@ -190,25 +255,39 @@ conflict visible** rather than silently bypassing either.
 
 ## Requirements and validation
 
-- An existing standard Spec Kit installation supporting presets and `wrap`
-  (v0.3.0 worked with your setup). Manifest retains the earlier version range
-  `speckit_version: ">=0.6.0"`; check actual CLI compatibility in your repo.
+- An existing standard Spec Kit installation supporting presets and `wrap`.
+  The manifest retains `speckit_version: ">=0.6.0"`; this is the Spec Kit
+  dependency range, independent of the SpecSense release version. Verify actual
+  CLI compatibility using the manual installation/resolution tests.
 - An initialized project configured for GitHub Copilot.
 - No Lean preset required; no template overrides shipped here.
 
 Validate offline:
 
 ```bash
+python3 -m pip install PyYAML
+python3 -m unittest -v test_package.py
 python3 /absolute/path/to/spec-sense/verify_package.py \
-  --previous /absolute/path/to/specsense-v0.5.3.zip \
-  --archive /absolute/path/to/spec-sense-v0.5.4.zip
+  --previous /absolute/path/to/spec-sense-v0.5.4.zip \
+  --build-archive /absolute/path/to/artifacts/spec-sense-v0.6.0.zip
+python3 /absolute/path/to/spec-sense/verify_package.py \
+  --archive /absolute/path/to/artifacts/spec-sense-v0.6.0.zip
 ```
 
 `SMOKE_TESTS.md` has manual Copilot scenarios for approvals, writes, no-gap
-cases, read-only behavior, existing checklists, and the unchanged five
-commands. The offline validator parses YAML (when PyYAML is installed), checks
-all wrapper files, checks all eight wrapper hashes against the previous v0.5.3 release, and simulates
-`{CORE_TEMPLATE}` composition. This is **not** an end-to-end Copilot test.
+cases, read-only behavior, existing checklists and the original command policies.
+Run unit tests from the repository root. The validator requires PyYAML, checks
+all eight handoff contracts and simulates `{CORE_TEMPLATE}` composition. With
+`--previous`, it compares the original policy text against v0.5.4 after removing
+only the new handoff block (normalizing line endings). This does not establish
+behavioral equivalence. It builds a reproducible ZIP and SHA-256 sidecar using an
+explicit file allowlist: no `.git`, caches, local dependencies or nested archives.
+`--archive` verifies exact paths, bytes, duplicates and CRCs.
+
+These are **not end-to-end Copilot tests**. The release gate in
+`docs/decision-handoff-test-plan.md` requires observed behavior in a clean test
+project, including failure recovery, cross-feature protection and native spec
+validation. Until that evidence exists, the ZIP is a prepared candidate only.
 
 ## Rollback
 
@@ -216,9 +295,11 @@ all wrapper files, checks all eight wrapper hashes against the previous v0.5.3 r
 specify preset remove spec-sense
 ```
 
-Then reinstall the known-good v0.5.3 package using `--dev` (which has a legacy
-preset ID). Removal changes the
-preset registration only; it does not undo already approved edits in a project.
+Then reinstall the known-good v0.5.4 package using `--dev` with the same
+`spec-sense` preset ID. Removal changes preset registration only; it does not
+undo already approved edits or remove pending sections from feature artifacts.
+Review existing artifacts explicitly after rollback; there is no automatic
+decision migration or cleanup.
 
 ## References
 

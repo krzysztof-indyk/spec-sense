@@ -91,3 +91,32 @@ to the existing `tasks.md`. Never edit or reorder earlier tasks, `spec.md`,
 
 Use **one focused question per reply**, not a multi-question checklist.
 Minimize chatter, not rigor. Preserve the full standard convergence format.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Convergence boundary
+
+- Reuse approved decisions as evidence under native intent/constitution rules;
+  distinguish future-stage intent from implemented work.
+- Only append the standard convergence phase after group/final approval.
+  Never create pending sections, rewrite tasks, transfer entries, or clean sources.
+- Label out-of-scope decisions unpersisted; retain pending sources. Recommend a
+  separate permitted workflow without invoking it or claiming completed transfer.

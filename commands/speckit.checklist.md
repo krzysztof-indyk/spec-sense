@@ -86,3 +86,32 @@ clarify is NOT a custom checklist to rewrite or mark as checked here.
 
 One focused question per turn; concise category reviews, full native
 checklist formatting in files. No boilerplate or speculative questions.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Checklist boundary
+
+- Reuse approved decisions; still check requirement quality and completeness.
+  Preserve category/final approvals, unchecked CHK items and append-only writes.
+- Never create pending entries in checklists, rewrite existing items or clean
+  other artifacts. Report source entries as retained, not transferred.
+- Label new product/design decisions unpersisted; checklist questions cannot
+  replace canonical decisions. Recommend separate clarify/plan without invoking it.

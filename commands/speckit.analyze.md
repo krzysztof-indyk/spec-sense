@@ -78,3 +78,30 @@ Avoid huge unprioritized dumps before the interactive review; show the
 high-signal finding and **one question per reply**. The final report remains
 complete (subject to the base command's finding limit), not truncated to
 only the questions asked.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Read-only boundary
+
+- Report pending/conflicting decisions with source references; no file writes of any kind.
+  Never add, transfer or erase entries. Preserve the full report and constitution authority.
+- Label new decisions conversation-only and unpersisted. Do not promise later-chat
+  recall. Recommend a separate writable command without invoking it.

@@ -69,3 +69,64 @@ make unsupported architecture decisions, follow this interactive gate first.
 Short, conversational and technical: a brief finding/recommendation and ONE question.
 No large unrequested architecture report in chat. Use normal comprehensive Spec Kit
 outputs on disk after approval.
+
+---
+
+## Decision Handoff — v0.6.0
+
+- Use native active-feature resolution; never guess paths. Read relevant artifacts
+  and pending sections before asking. Classify decisions in memory: approved,
+  open, conflicting, later-stage or out-of-scope. Track source references.
+- Reuse approved decisions, including semantically equivalent wording. Do not
+  treat suggestions or defaults as approval. Reopen only missing details,
+  material contradictions or new risks; explain what changed.
+- Keep discovery read-only, including scripts/hooks. Preserve existing gates
+  and `--auto` limits. Require no additional handoff approval for unchanged
+  decisions; preview transfers in the existing final write summary.
+- Apply forward-only adoption: read historical artifacts, but do not migrate
+  old decisions. Add no registry, runtime, command or core template/script change.
+  Never auto-invoke another stage. Reading a source grants no write permission.
+- Re-read saved output; verify meaning, constraints and qualifiers. Account for
+  every new approved decision. Report persisted, pending or unpersisted status;
+  never claim complete persistence when missing or lose the only durable copy.
+
+### Transfer — approved Option A
+
+1. Retain resolved active-feature identity and source content. Select only
+   approved entries targeting `speckit.plan` and native planning outputs.
+   Reject ambiguous entries or duplicate IDs as cleanup candidates.
+2. Preview destinations and exact cleanup IDs in existing final plan approval.
+   Require that approval to cover cleanup; do not reapprove unchanged decisions.
+   Rejection means no writes. Recheck feature/source/target before writing;
+   stop affected work on material changes and explain the discrepancy.
+3. Save the full decision canonically in native planning output, normally
+   `research.md` or appropriate `plan.md`. Map source IDs to destination sections
+   in memory. Preserve qualifiers; run the standard workflow and hooks.
+4. RE-READ DESTINATION BEFORE SOURCE DELETION. Verify complete meaning, not
+   similar topics. On write/verification failure, keep the source and report
+   incomplete transfer. Only individually verified entries qualify for cleanup.
+5. Immediately before cleanup, re-resolve the feature and re-read `spec.md`.
+   Abort deletion if the feature switched, entries changed/disappeared, IDs
+   became ambiguous or source changed materially. Explain the conflict; ask
+   only about changed matters when necessary.
+6. Match by stable ID AND decision content. Remove only verified, approved,
+   plan-targeted entries from active `spec.md`. Preserve all other entries,
+   requirements, constraints, Clarifications and metadata byte-for-byte.
+   Remove the heading only if no pending content remains. Edit no other source.
+7. Re-read source AND destination. Verify decisions remain at the destination,
+   only selected entries disappeared and unrelated content is intact. On failure,
+   keep verified output and original pending entries; report incomplete cleanup.
+   Reinspect interrupted/uncertain writes; never assume success.
+8. Retry idempotently: verify existing destination decisions, then attempt only
+   eligible cleanup. Do not duplicate/overwrite decisions. Preserve the source
+   whenever a precondition is uncertain.
+
+### New decisions
+
+- At final approved writing, save current decisions canonically. Put genuinely
+  later-stage decisions in one `## Pending Handoffs` section of `plan.md` with
+  stable feature ID, approved meaning/provenance and native command/artifact
+  target. Check existing IDs; never recycle an unfinished ID. Verify persistence.
+- Keep pending entries out of tasks/checklists. Allow later stages to read
+  `plan.md`; grant no later-stage cross-artifact cleanup permission. Retain entries
+  and report pending cleanup. Do not extend the active-spec-to-plan exception.

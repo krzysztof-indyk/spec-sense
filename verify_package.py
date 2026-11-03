@@ -1,27 +1,114 @@
 #!/usr/bin/env python3
-"""Offline verification for SpecSense v0.5.4.
+"""Offline verification and reproducible packaging for SpecSense v0.6.0.
 
 Usage:
-    python3 verify_package.py --previous /path/to/specsense-v0.5.3.zip
-    python3 verify_package.py --archive /path/to/spec-sense-v0.5.4.zip
+    python3 verify_package.py --previous /path/to/spec-sense-v0.5.4.zip
+    python3 verify_package.py --build-archive /path/to/spec-sense-v0.6.0.zip
+    python3 verify_package.py --archive /path/to/spec-sense-v0.6.0.zip
 
 Structural/integrity checks only. Does not emulate Copilot or execute Spec Kit.
 """
 import argparse
 import hashlib
 from pathlib import Path
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parent
 BASE = ("specify", "clarify", "plan", "tasks", "constitution")
 NEW = ("converge", "analyze", "checklist")
 ALL = BASE + NEW
+VERSION = "0.6.0"
+HANDOFF_MARKER = "\n---\n\n## Decision Handoff — v0.6.0\n"
+RELEASE_FILES = (
+    "LICENSE", "THIRD_PARTY_NOTICES.md", "README.md", "CHANGELOG.md",
+    "SMOKE_TESTS.md", "preset.yml", "verify_package.py", "test_package.py",
+    "docs/decision-handoff-requirements.md",
+    "docs/decision-handoff-technical-design.md",
+    "docs/decision-handoff-test-plan.md", "docs/validation-results.md",
+) + tuple(f"commands/speckit.{name}.md" for name in ALL)
+
+
+def original_policy(contents: str) -> str:
+    """Remove only the appended handoff block for baseline policy comparison."""
+    return contents.split(HANDOFF_MARKER, 1)[0]
+
+
+def verify_handoff(name: str, contents: str) -> None:
+    assert contents.count(HANDOFF_MARKER) == 1, f"{name}: expected one final handoff block"
+    policy, block = contents.split(HANDOFF_MARKER)
+    assert "## SDDW interactive policy" in policy, f"{name}: handoff must follow the original policy"
+    assert "## SDDW interactive policy" not in block, f"{name}: handoff must be last"
+    normalized = " ".join(block.split())
+    for phrase in (
+        "native active-feature resolution",
+        "semantically equivalent", "forward-only adoption", "read-only",
+        "no additional handoff approval", "constraints and qualifiers",
+        "only durable copy",
+    ):
+        assert phrase in normalized, f"{name}: missing handoff contract: {phrase}"
+    required = {
+        "specify": ("exactly one", "DH-001", "final", "every new approved", "do not bypass validation"),
+        "clarify": ("DH-001", "Read and preserve", "no-change path", "do not bypass validation"),
+        "plan": ("approved Option A", "duplicate IDs", "byte-for-byte", "feature switched",
+                 "stable ID AND decision content", "Retry idempotently", "no pending content remains",
+                 "report incomplete cleanup", "no later-stage cross-artifact cleanup"),
+        "tasks": ("Do not create a pending", "report pending cleanup", "unpersisted"),
+        "constitution": ("Never put feature-specific", "only writable file", "unpersisted"),
+        "checklist": ("Never create pending entries", "append-only", "unpersisted"),
+        "analyze": ("no file writes of any kind", "conversation-only and unpersisted"),
+        "converge": ("Only append", "transfer entries, or clean", "unpersisted"),
+    }
+    # Normalize line wraps; these are prompt-presence checks, NOT agent execution.
+    for phrase in required[name]:
+        assert phrase in normalized, f"{name}: missing boundary: {phrase}"
+    if name == "plan":
+        steps = ("Save the full decision", "RE-READ DESTINATION BEFORE SOURCE DELETION",
+                 "Immediately before cleanup", "Match by stable ID", "Re-read source AND destination",
+                 "Retry idempotently")
+        positions = [block.index(step) for step in steps]
+        assert positions == sorted(positions), "plan: unsafe transfer instruction order"
+    else:
+        assert "approved Option A" not in block, f"{name}: unexpected cleanup exception"
+
+
+def verify_archive(path: Path) -> None:
+    expected = {f"spec-sense/{rel}" for rel in RELEASE_FILES}
+    with ZipFile(path) as archive:
+        assert archive.testzip() is None, "Corrupt archive"
+        names = archive.namelist()
+        assert len(names) == len(set(names)), "Duplicate archive member"
+        files = {i.filename for i in archive.infolist() if not i.is_dir()}
+        assert files == expected, f"Archive files differ: {files ^ expected}"
+        allowed_dirs = {"spec-sense/", "spec-sense/commands/", "spec-sense/docs/"}
+        assert set(names) - files <= allowed_dirs, "Unexpected archive directories"
+        for rel in RELEASE_FILES:
+            assert archive.read(f"spec-sense/{rel}") == (ROOT / rel).read_bytes(), rel
+    print(f"OK: ZIP allowlist + {len(expected)} exact file contents + CRC checks")
+
+
+def build_archive(path: Path) -> None:
+    # Never package .git, local artifacts, caches or arbitrary untracked files.
+    assert path.resolve() not in {(ROOT / rel).resolve() for rel in RELEASE_FILES}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with ZipFile(path, "w", compression=ZIP_DEFLATED) as archive:
+        for rel in sorted(RELEASE_FILES):
+            info = ZipInfo(f"spec-sense/{rel}", date_time=(2026, 11, 3, 0, 0, 0))
+            info.compress_type = ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100644 << 16
+            archive.writestr(info, (ROOT / rel).read_bytes())
+    verify_archive(path)
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    path.with_suffix(path.suffix + ".sha256").write_text(
+        f"{digest}  {path.name}\n", encoding="utf-8")
+    print(f"Prepared candidate package: {path}; Copilot release gate remains separate")
 
 
 def check() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--previous", type=Path, help="Previous v0.5.3 ZIP")
-    parser.add_argument("--archive", type=Path, help="New v0.5.4 ZIP")
+    parser.add_argument("--previous", type=Path, help="Baseline v0.5.4 ZIP (original policy regression)")
+    parser.add_argument("--archive", type=Path, help="Verify a v0.6.0 ZIP")
+    parser.add_argument("--build-archive", type=Path, help="Build and verify a candidate ZIP")
     args = parser.parse_args()
 
     yaml_text = (ROOT / "preset.yml").read_text(encoding="utf-8")
@@ -32,10 +119,12 @@ def check() -> None:
     m = yaml.safe_load(yaml_text)
     assert m["schema_version"] == "1.0"
     assert m["preset"]["id"] == "spec-sense"
-    assert m["preset"]["version"] == "0.5.4"
+    assert m["preset"]["version"] == VERSION
     assert m["preset"]["license"] == "MIT"
     assert m["preset"]["name"].startswith("SpecSense")
     assert ROOT.name == "spec-sense"
+    for rel in RELEASE_FILES:
+        assert (ROOT / rel).is_file(), f"Missing release file: {rel}"
     license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
     notice_text = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -69,6 +158,7 @@ def check() -> None:
         assert contents.count("{CORE_TEMPLATE}") == 1, name
         assert "SDDW interactive policy" in contents, name
         assert any(word in contents.lower() for word in ("approval", "approve", "decision")), name
+        verify_handoff(name, contents)
         # Simulate native command composition with YAML metadata at the top.
         mock_core = "---\ndescription: native core\n---\n## Native instruction\n"
         composed = contents.replace("{CORE_TEMPLATE}", mock_core)
@@ -83,7 +173,7 @@ def check() -> None:
         "checklist": ("requirements-quality", "one category", "unchecked", "append-only", "final"),
     }
     for name, phrases in details.items():
-        content = (ROOT / f"commands/speckit.{name}.md").read_text().lower()
+        content = (ROOT / f"commands/speckit.{name}.md").read_text(encoding="utf-8").lower()
         for phrase in phrases:
             assert phrase.lower() in content, f"{name} missing {phrase!r}"
 
@@ -96,25 +186,18 @@ def check() -> None:
                 assert len(prior_roots) == 1, f"Unexpected prior ZIP roots: {prior_roots}"
                 prior_root = next(iter(prior_roots))
                 old = prev.read(prior_root + "/" + rel)
-                new = (ROOT / rel).read_bytes()
-                assert old == new, f"Regression: {name} differs from v0.4.0"
-                digest = hashlib.sha256(new).hexdigest()[:16]
-                print(f"UNCHANGED v0.5.3 -> v0.5.4: {name} sha256={digest}")
+                assert yaml.safe_load(prev.read(prior_root + "/preset.yml"))["preset"]["version"] == "0.5.4"
+                new = original_policy((ROOT / rel).read_text(encoding="utf-8"))
+                baseline = old.decode("utf-8").replace("\r\n", "\n")
+                assert baseline == new, f"Regression: original {name} policy differs from v0.5.4"
+                print(f"PRESERVED v0.5.4 policy: {name} (line endings normalized)")
 
     if args.archive:
-        expected_paths = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob("*") if p.is_file()}
-        with ZipFile(args.archive) as archive:
-            assert archive.testzip() is None
-            members = [i.filename for i in archive.infolist() if not i.is_dir()]
-            assert len(members) == len(set(members))
-            paths = {Path(n).relative_to("spec-sense").as_posix() for n in members}
-            assert paths == expected_paths, f"Archive files differ: {paths ^ expected_paths}"
-            for name in members:
-                local = ROOT / Path(name).relative_to("spec-sense")
-                assert archive.read(name) == local.read_bytes(), name
-        print(f"OK: ZIP structure + {len(members)} content hashes + CRC checks")
+        verify_archive(args.archive)
+    if args.build_archive:
+        build_archive(args.build_archive)
 
-    print("PASS: v0.5.4 manifest, eight wrapped commands, new policies, naming and regression checks")
+    print("PASS: v0.6.0 static/package checks only; Copilot behavior NOT tested by this validator")
 
 
 if __name__ == "__main__":
