@@ -122,3 +122,20 @@ hooks, test without them first, then separately test safe and unsafe hooks.
 46. Inspect resulting `tasks.md`, checklists and analysis report for missing
     required native metadata, false assertions of execution, and unexpected
     file modifications.
+
+
+## v0.6.0 — Decision Handoff quick smoke (manual)
+
+Full acceptance criteria: [27-case plan](docs/decision-handoff-test-plan.md).
+
+1. Approve a future-stage technical decision in `specify`. At the final spec
+   write, verify one pending entry with stable ID, target and full qualifiers.
+2. Run `clarify`: it must preserve the entry and **not ask again**.
+3. Run `plan`: verify the entire decision in `research.md` before only the
+   matching plan-targeted entry is removed from `spec.md`.
+4. Simulate target-write or cleanup failure: no decision loss, no false success.
+   Retry must not duplicate the decision.
+5. Confirm `analyze` read-only, `converge` append-only, and other command scope.
+6. Confirm no migration or backfill for an existing feature without pending.
+
+These require real Copilot execution. Static validation cannot prove them.

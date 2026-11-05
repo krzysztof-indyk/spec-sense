@@ -1,4 +1,4 @@
-# SpecSense v0.5.4 — Standard Spec Kit + GitHub Copilot
+# SpecSense v0.6.0 — Standard Spec Kit + GitHub Copilot
 
 **Unofficial** Spec Kit preset inspired by [sermakarevich/sddw](https://github.com/sermakarevich/sddw).
 It adapts **how Spec Kit collaborates with the user**; it does **not** replace Spec Kit's standard process, templates, scripts, or artifact formats. No Lean dependency.
@@ -39,6 +39,22 @@ artifact structure.
 - The native `speckit.*` command names stay unchanged for compatibility with standard Spec Kit.
 
 ## Release notes
+
+**v0.6.0 — Decision Handoff:** All eight command wrappers now reuse previously
+approved decisions from native Spec Kit artifacts before asking new questions.
+Future-stage decisions approved during Discovery are persisted at the **final
+approved stage write** in a temporary `## Pending Handoffs` section. No new
+registry, workflow stage, or changes to core templates and scripts.
+
+The **only** cross-artifact cleanup exception is `speckit.plan`: after fully
+verifying an incoming plan-targeted decision in native `research.md`/`plan.md`,
+it may remove precisely that unchanged pending entry from the active feature's
+`spec.md`. Other commands retain their read-only/append-only/write scopes.
+
+This is an **LLM-instruction implementation**, not a transactional runtime.
+Static package checks are included. The 27 live Copilot tests in
+[Decision Handoff Test Plan](docs/decision-handoff-test-plan.md) must still
+be performed before claiming end-to-end acceptance.
 
 **v0.5.4 — naming consistency:** renamed the source/archive root and preset ID
 from the historical unhyphenated identifier to **`spec-sense`**, while keeping
@@ -89,6 +105,41 @@ copyright notices and review any applicable additional licenses.
 | **`speckit.checklist`** | **Discover review scope; preview/approve questions category-by-category; final write consent** | **Reviewer-owned requirements-quality checklist(s), native CHK IDs, append-only domain files** |
 
 Other Spec Kit commands, including `implement`, and all artifact **templates** are unmodified.
+
+## Decision Handoff — ask once, decide once
+
+Example: while discussing `specify`, you explicitly approve a technical
+choice (such as respecting `Retry-After` with a retry cap). The choice belongs
+to `plan`, but must not be forgotten or asked again.
+
+1. At the **approved final write**, `specify` adds to its existing `spec.md`:
+
+   ```markdown
+   ## Pending Handoffs
+
+   - **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After for HTTP 429, with the agreed retry cap. Approved during speckit.specify.
+   ```
+
+2. `clarify` reads and preserves that entry; it does not ask again.
+3. `plan` reuses the decision within the normal approval and writes its full
+   meaning into `research.md` or an appropriate native planning artifact.
+4. **Only after re-reading and verifying** the destination, `plan` can remove
+   just the unchanged, plan-targeted entry from the active feature's `spec.md`.
+   It keeps other pending entries and all permanent requirements intact.
+5. If writing or verification fails, the source entry survives; a retry must
+   not duplicate an existing valid destination. No extra human approval is
+   required solely to carry forward an already approved decision.
+
+Only **new decisions** are managed in this way; old feature files are not
+backfilled. Decisions belonging to the current stage still go into canonical
+Spec Kit sections. Pending handoffs do **not** extend permissions globally:
+`analyze` remains read-only, `converge` remains append-only, and other stages
+may consume decisions without permission to clean the original source.
+
+The design and regression scenarios are part of this release:
+[Requirements](docs/decision-handoff-requirements.md),
+[Technical Design](docs/decision-handoff-technical-design.md),
+[Test Plan](docs/decision-handoff-test-plan.md).
 
 ## Interactive workflow details
 
@@ -200,15 +251,14 @@ Validate offline:
 
 ```bash
 python3 /absolute/path/to/spec-sense/verify_package.py \
-  --previous /absolute/path/to/specsense-v0.5.3.zip \
-  --archive /absolute/path/to/spec-sense-v0.5.4.zip
+  --previous /absolute/path/to/spec-sense-v0.5.4.zip \
+  --archive /absolute/path/to/spec-sense-v0.6.0.zip
 ```
 
-`SMOKE_TESTS.md` has manual Copilot scenarios for approvals, writes, no-gap
-cases, read-only behavior, existing checklists, and the unchanged five
-commands. The offline validator parses YAML (when PyYAML is installed), checks
-all wrapper files, checks all eight wrapper hashes against the previous v0.5.3 release, and simulates
-`{CORE_TEMPLATE}` composition. This is **not** an end-to-end Copilot test.
+`SMOKE_TESTS.md` includes earlier manual scenarios; the Decision Handoff
+test plan adds 27 scenarios. Agent behavior cannot be proven statically. The offline validator parses YAML (when PyYAML is installed), checks
+all wrapper files, checks preservation of original v0.5.4 wrapper content, validates per-command
+Decision Handoff policy markers and simulates `{CORE_TEMPLATE}` composition. This is **not** an end-to-end Copilot test.
 
 ## Rollback
 
@@ -216,9 +266,9 @@ all wrapper files, checks all eight wrapper hashes against the previous v0.5.3 r
 specify preset remove spec-sense
 ```
 
-Then reinstall the known-good v0.5.3 package using `--dev` (which has a legacy
-preset ID). Removal changes the
-preset registration only; it does not undo already approved edits in a project.
+Then reinstall the known-good **v0.5.4** package using `--dev` (same
+`spec-sense` preset ID). Removing the preset does not undo feature-document
+edits from prior runs; restore those through version control if necessary.
 
 ## References
 
