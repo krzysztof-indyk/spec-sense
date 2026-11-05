@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Static SpecSense v0.6.0 package and additive handoff-contract validator.
+"""Static SpecSense v0.6.1 package and additive handoff-contract validator.
 
 No Copilot execution or transactional behavior is simulated by this script.
-Usage: python verify_package.py --previous old-v0.5.4.zip --archive new-v0.6.0.zip
+Usage: python verify_package.py --previous old-v0.5.4.zip --archive new-v0.6.1.zip
 """
 import argparse
 from pathlib import Path
@@ -27,7 +27,7 @@ def check(previous=None, archive=None):
     manifest = yaml.safe_load((ROOT / 'preset.yml').read_text(encoding='utf-8'))
     assert manifest['schema_version'] == '1.0'
     p = manifest['preset']
-    assert p['id'] == 'spec-sense' and p['version'] == '0.6.0'
+    assert p['id'] == 'spec-sense' and p['version'] == '0.6.1'
     assert p['name'].startswith('SpecSense') and p['license'] == 'MIT'
     assert set(manifest['provides']) == {'templates'}
     entries = manifest['provides']['templates']
@@ -46,6 +46,7 @@ def check(previous=None, archive=None):
         assert contents.count('## SpecSense v0.6.0 — Decision Handoff') == 1
         assert '## Pending Handoffs' in contents
         assert 'Read before asking' in contents
+        assert contents.count('In native Copilot question UI, send only this decision item') == 1
         assert 'explicit approved decision' in contents or 'explicit approved' in contents
         assert 'final approved write' in contents
         assert 'do not backfill' in contents
@@ -84,7 +85,7 @@ def check(previous=None, archive=None):
         for unchanged in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
             assert (ROOT / unchanged).read_bytes() == read_previous(previous, unchanged)
     readme = (ROOT / 'README.md').read_text()
-    for term in ('SpecSense v0.6.0', 'Pending Handoffs', 'plan-targeted',
+    for term in ('SpecSense v0.6.1', 'Pending Handoffs', 'plan-targeted',
                  'decision-handoff-technical-design.md', 'spec-sense',
                  'https://github.com/sermakarevich/sddw',
                  'https://github.com/github/spec-kit'):
@@ -104,7 +105,7 @@ def check(previous=None, archive=None):
                 f = ROOT / Path(name).relative_to('spec-sense')
                 assert z.read(name) == f.read_bytes(), name
         print('PASS: archive integrity, paths, exact bytes:', len(files), 'files')
-    print('PASS: SpecSense v0.6.0 STATIC validation (agent E2E not run)')
+    print('PASS: SpecSense v0.6.1 STATIC validation (agent E2E not run)')
 
 
 if __name__ == '__main__':

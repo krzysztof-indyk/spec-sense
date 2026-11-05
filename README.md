@@ -1,4 +1,4 @@
-# SpecSense v0.6.0 — Standard Spec Kit + GitHub Copilot
+# SpecSense v0.6.1 — Standard Spec Kit + GitHub Copilot
 
 **Unofficial** Spec Kit preset inspired by [sermakarevich/sddw](https://github.com/sermakarevich/sddw).
 It adapts **how Spec Kit collaborates with the user**; it does **not** replace Spec Kit's standard process, templates, scripts, or artifact formats. No Lean dependency.
@@ -39,6 +39,11 @@ artifact structure.
 - The native `speckit.*` command names stay unchanged for compatibility with standard Spec Kit.
 
 ## Release notes
+
+**v0.6.1 — fewer redundant prompts:** Existing native Copilot decisions stay;
+do not add an optional second comment tab
+alongside a valid decision question. Request missing change details only
+after a user selects a change. No extra approvals or workflow stages.
 
 **v0.6.0 — Decision Handoff:** All eight command wrappers now reuse previously
 approved decisions from native Spec Kit artifacts before asking new questions.

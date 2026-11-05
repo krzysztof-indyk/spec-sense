@@ -1,4 +1,4 @@
-# Smoke tests — SpecSense v0.5.4 + GitHub Copilot
+# Smoke tests — SpecSense v0.6.1 + GitHub Copilot
 
 **Manual acceptance scenarios**, not executed by the offline package validator.
 Test in a disposable initialized Spec Kit project; inspect git status and
@@ -139,3 +139,15 @@ Full acceptance criteria: [27-case plan](docs/decision-handoff-test-plan.md).
 6. Confirm no migration or backfill for an existing feature without pending.
 
 These require real Copilot execution. Static validation cannot prove them.
+
+## v0.6.1 — unnecessary question tab removal (manual)
+
+- In native Copilot, ask a legitimate decision such as “Decyzja o zakresie”.
+  Verify the interaction includes only that question, not a second optional
+  “Zmiana (jeśli potrzebna)” tab or a separate comment input.
+- Accept the recommended option: no extra change-details question appears.
+  Choose a change instead: ask for required specifics only then.
+- Confirm existing group, stage and file-write approvals still behave as before.
+
+The CLI interface behavior must be checked in Copilot; offline checks only
+validate the preset text and package contents.
