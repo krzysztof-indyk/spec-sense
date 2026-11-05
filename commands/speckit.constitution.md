@@ -98,29 +98,69 @@ constitution file and governance conventions after approval.
 
 ---
 
-## Decision Handoff — v0.6.0
+## SpecSense v0.6.0 — Decision Handoff (shared safety contract)
 
-- Use native active-feature resolution; never guess paths. Read relevant artifacts
-  and pending sections before asking. Classify decisions in memory: approved,
-  open, conflicting, later-stage or out-of-scope. Track source references.
-- Reuse approved decisions, including semantically equivalent wording. Do not
-  treat suggestions or defaults as approval. Reopen only missing details,
-  material contradictions or new risks; explain what changed.
-- Keep discovery read-only, including scripts/hooks. Preserve existing gates
-  and `--auto` limits. Require no additional handoff approval for unchanged
-  decisions; preview transfers in the existing final write summary.
-- Apply forward-only adoption: read historical artifacts, but do not migrate
-  old decisions. Add no registry, runtime, command or core template/script change.
-  Never auto-invoke another stage. Reading a source grants no write permission.
-- Re-read saved output; verify meaning, constraints and qualifiers. Account for
-  every new approved decision. Report persisted, pending or unpersisted status;
-  never claim complete persistence when missing or lose the only durable copy.
+This extends the **existing** Spec Kit command and the interactive policy above;
+it is not a new command, storage system or replacement for native scripts,
+templates, hooks, approval gates or artifact formats.
 
-### Governance boundary
+- **Read before asking:** use standard Spec Kit active-feature resolution and
+  permitted read-only prerequisites to inspect relevant `spec.md` (including
+  Clarifications), `research.md`, `plan.md`, `tasks.md`, constitution and any
+  existing `## Pending Handoffs`. An absent section is normal for older
+  features; **do not backfill** historical decisions. Use only current-feature
+  artifacts, never a guessed path or remembered chat as the sole authority.
+- **Ask only what is still open:** an explicit approved decision, even if
+  phrased differently, is already answered. Do not reconfirm it merely because
+  a new command or discovery phase began. Only ask about a missing material
+  detail, genuine contradiction or newly discovered risk; show the earlier
+  decision and the specific new information first. One focused question if
+  clarification is necessary; no mandatory question if nothing is missing.
+- **Approved versus proposed:** don't promote exploratory options, implicit
+  defaults, unaccepted recommendations or conversation-only risk discussions
+  into binding decisions. An approved requirement stays in its native section;
+  store only an approved *future-stage* decision temporarily, and only in a
+  document this command can normally write under its existing final approval.
+- **Temporary format:** when needed, use a single `## Pending Handoffs` section
+  in the current native artifact. One stable feature-unique ID per entry, e.g.
+  `- **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After on
+  HTTP 429, with an explicit cap. Approved during speckit.specify.` Preserve
+  the exact decision, qualifiers and target existing Spec Kit artifact. Do not
+  create a new decision file or change any core template. Do not add an empty
+  section. Avoid duplicate entries if the target already contains the decision.
+- **Persistence gate:** collect approvals in chat during Discovery. At the
+  command's existing **final approved write** only, persist approved
+  current-stage decisions canonically and eligible future-stage decisions as
+  pending entries; then re-read and verify coverage before reporting success.
+  Never run write-capable tools early. Preview incoming/outgoing handoffs in
+  the existing approval summary; do not demand another approval for a decision
+  already accepted. Existing `--auto` does not cancel safety/write gates.
+- **Transfer rule:** consume incoming decisions when the target command runs,
+  verify the *full meaning and qualifiers* in the native target after its
+  authorized write, and only then clean a source entry **if that command is
+  specifically allowed to edit that source**. On incomplete writes, missing
+  qualifiers, changed source or uncertain feature identity, preserve the
+  pending entry and report the incomplete handoff. Never delete permanent
+  product requirements or constraints. Do not silently retry or duplicate.
+- **Hard boundaries:** `speckit.analyze` is read-only; `speckit.converge`
+  remains append-only; `speckit.constitution` changes only its constitution;
+  custom checklist files remain append-only. The **only** approved bounded
+  cross-artifact cleanup exception is in `speckit.plan`, defined below. Other
+  commands may reuse pending decisions but cannot delete earlier-stage entries
+  by inventing new permissions. If cleanup is outside the command's scope,
+  preserve the source and identify the outstanding cleanup without claiming
+  a fully completed transfer.
 
-- Reuse approved constraints; do not treat feature choices as ratified governance.
-  Never put feature-specific handoffs or pending sections in the constitution.
-- The only writable file remains `.specify/memory/constitution.md`. Preserve
-  principle/final approvals; verify governance changes in canonical text.
-- Never transfer/clean feature entries. Label out-of-scope decisions unpersisted;
-  recommend a separate permitted workflow without invoking it.
+### Decision Handoff — `constitution` responsibilities
+
+- Read relevant approved project governance and applicable feature context
+  before asking to ratify a principle; do not reopen settled choices without
+  a material conflict. A feature-specific technical choice is **not** a
+  constitutional principle and must never be moved into governance merely
+  because it appears in a Pending Handoffs section.
+- Only `.specify/memory/constitution.md` is writable, under the existing
+  individual-principle and final approval gates. Never add feature-specific
+  pending entries or modify feature artifacts from `constitution`. If a newly
+  approved feature-specific detail needs durable recording, explain that an
+  appropriate write-capable feature command is required; do not claim the
+  decision was persisted here.

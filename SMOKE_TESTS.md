@@ -1,8 +1,4 @@
-# Smoke tests — SpecSense v0.6.0 + GitHub Copilot
-
-Run these existing-policy regressions together with T01–T27 in
-`docs/decision-handoff-test-plan.md`. Results are tracked separately in
-`docs/validation-results.md`; a scenario listed here is not evidence it passed.
+# Smoke tests — SpecSense v0.5.4 + GitHub Copilot
 
 **Manual acceptance scenarios**, not executed by the offline package validator.
 Test in a disposable initialized Spec Kit project; inspect git status and
@@ -11,17 +7,15 @@ hooks, test without them first, then separately test safe and unsafe hooks.
 
 ## Registration and regression (1–8)
 
-1. `specify preset list` reports `spec-sense` v0.6.0. Lean is not required.
+1. `specify preset list` reports `spec-sense` v0.5.4. Lean is not required.
    Verify the unpacked directory and ZIP root are `spec-sense/` while the
    manifest `preset.name` and documentation use the public name **SpecSense**.
    If a legacy preset is still installed, remove it before adding `spec-sense`.
 2. All eight `specify preset resolve speckit.<name>` commands resolve this preset.
 3. Verify the effective Copilot skills/agent instructions include **core command**
    plus SDDW wrapper; no raw `{CORE_TEMPLATE}` remains.
-4. Compare the original policy portions of all eight wrappers against the
-   v0.5.4 ZIP using `verify_package.py --previous`. Only the added handoff block
-   is excluded; line endings are normalized. Exercise the policies below to
-   detect behavioral regressions that text comparison cannot establish.
+4. Compare all eight wrapper files byte-for-byte against the v0.5.3 ZIP.
+   The naming migration must not change behavior.
 5. Run `speckit.specify` with a vague feature idea: one question at a time,
    no write before final approval; standard spec generated afterward.
 6. Run `speckit.clarify`: one question at a time, approved batch before update.
@@ -121,12 +115,27 @@ hooks, test without them first, then separately test safe and unsafe hooks.
     a hook with side effects requires separate authorization to run during
     the discovery gate or is delayed until the final authorized workflow,
     with any blockers stated explicitly.
-44. Run offline `verify_package.py --previous /path/spec-sense-v0.5.4.zip`
-    and inspect `PRESERVED` policy results for all eight commands. Run
-    `python3 -m unittest -v test_package.py` and verify the candidate ZIP with
-    `verify_package.py --archive /path/spec-sense-v0.6.0.zip`.
-45. Remove v0.6.0 and reinstall v0.5.4; previous commands work as before;
+44. Run offline `verify_package.py --previous /path/specsense-v0.5.3.zip`
+    and inspect `UNCHANGED` hashes for all eight commands.
+45. Remove v0.5.4 and reinstall v0.5.3; previous commands work as before;
     artifacts already generated with user approval are not removed.
 46. Inspect resulting `tasks.md`, checklists and analysis report for missing
     required native metadata, false assertions of execution, and unexpected
     file modifications.
+
+
+## v0.6.0 — Decision Handoff quick smoke (manual)
+
+Full acceptance criteria: [27-case plan](docs/decision-handoff-test-plan.md).
+
+1. Approve a future-stage technical decision in `specify`. At the final spec
+   write, verify one pending entry with stable ID, target and full qualifiers.
+2. Run `clarify`: it must preserve the entry and **not ask again**.
+3. Run `plan`: verify the entire decision in `research.md` before only the
+   matching plan-targeted entry is removed from `spec.md`.
+4. Simulate target-write or cleanup failure: no decision loss, no false success.
+   Retry must not duplicate the decision.
+5. Confirm `analyze` read-only, `converge` append-only, and other command scope.
+6. Confirm no migration or backfill for an existing feature without pending.
+
+These require real Copilot execution. Static validation cannot prove them.

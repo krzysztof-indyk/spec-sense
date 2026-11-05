@@ -4,7 +4,7 @@ preset:
   id: "spec-sense"
   name: "SpecSense — Standard Spec Kit"
   version: "0.6.0"
-  description: "Decision Handoff and SDDW interactive gates for eight standard Spec Kit commands (no Lean)"
+  description: "SDDW interactive gates and approved Decision Handoff for eight standard Spec Kit commands (no Lean)"
   author: "Community adaptation (unofficial)"
   license: "MIT"
 

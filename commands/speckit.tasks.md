@@ -92,29 +92,69 @@ file format on disk; conversational previews should be concise, not vague.
 
 ---
 
-## Decision Handoff — v0.6.0
+## SpecSense v0.6.0 — Decision Handoff (shared safety contract)
 
-- Use native active-feature resolution; never guess paths. Read relevant artifacts
-  and pending sections before asking. Classify decisions in memory: approved,
-  open, conflicting, later-stage or out-of-scope. Track source references.
-- Reuse approved decisions, including semantically equivalent wording. Do not
-  treat suggestions or defaults as approval. Reopen only missing details,
-  material contradictions or new risks; explain what changed.
-- Keep discovery read-only, including scripts/hooks. Preserve existing gates
-  and `--auto` limits. Require no additional handoff approval for unchanged
-  decisions; preview transfers in the existing final write summary.
-- Apply forward-only adoption: read historical artifacts, but do not migrate
-  old decisions. Add no registry, runtime, command or core template/script change.
-  Never auto-invoke another stage. Reading a source grants no write permission.
-- Re-read saved output; verify meaning, constraints and qualifiers. Account for
-  every new approved decision. Report persisted, pending or unpersisted status;
-  never claim complete persistence when missing or lose the only durable copy.
+This extends the **existing** Spec Kit command and the interactive policy above;
+it is not a new command, storage system or replacement for native scripts,
+templates, hooks, approval gates or artifact formats.
 
-### Task boundary
+- **Read before asking:** use standard Spec Kit active-feature resolution and
+  permitted read-only prerequisites to inspect relevant `spec.md` (including
+  Clarifications), `research.md`, `plan.md`, `tasks.md`, constitution and any
+  existing `## Pending Handoffs`. An absent section is normal for older
+  features; **do not backfill** historical decisions. Use only current-feature
+  artifacts, never a guessed path or remembered chat as the sole authority.
+- **Ask only what is still open:** an explicit approved decision, even if
+  phrased differently, is already answered. Do not reconfirm it merely because
+  a new command or discovery phase began. Only ask about a missing material
+  detail, genuine contradiction or newly discovered risk; show the earlier
+  decision and the specific new information first. One focused question if
+  clarification is necessary; no mandatory question if nothing is missing.
+- **Approved versus proposed:** don't promote exploratory options, implicit
+  defaults, unaccepted recommendations or conversation-only risk discussions
+  into binding decisions. An approved requirement stays in its native section;
+  store only an approved *future-stage* decision temporarily, and only in a
+  document this command can normally write under its existing final approval.
+- **Temporary format:** when needed, use a single `## Pending Handoffs` section
+  in the current native artifact. One stable feature-unique ID per entry, e.g.
+  `- **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After on
+  HTTP 429, with an explicit cap. Approved during speckit.specify.` Preserve
+  the exact decision, qualifiers and target existing Spec Kit artifact. Do not
+  create a new decision file or change any core template. Do not add an empty
+  section. Avoid duplicate entries if the target already contains the decision.
+- **Persistence gate:** collect approvals in chat during Discovery. At the
+  command's existing **final approved write** only, persist approved
+  current-stage decisions canonically and eligible future-stage decisions as
+  pending entries; then re-read and verify coverage before reporting success.
+  Never run write-capable tools early. Preview incoming/outgoing handoffs in
+  the existing approval summary; do not demand another approval for a decision
+  already accepted. Existing `--auto` does not cancel safety/write gates.
+- **Transfer rule:** consume incoming decisions when the target command runs,
+  verify the *full meaning and qualifiers* in the native target after its
+  authorized write, and only then clean a source entry **if that command is
+  specifically allowed to edit that source**. On incomplete writes, missing
+  qualifiers, changed source or uncertain feature identity, preserve the
+  pending entry and report the incomplete handoff. Never delete permanent
+  product requirements or constraints. Do not silently retry or duplicate.
+- **Hard boundaries:** `speckit.analyze` is read-only; `speckit.converge`
+  remains append-only; `speckit.constitution` changes only its constitution;
+  custom checklist files remain append-only. The **only** approved bounded
+  cross-artifact cleanup exception is in `speckit.plan`, defined below. Other
+  commands may reuse pending decisions but cannot delete earlier-stage entries
+  by inventing new permissions. If cleanup is outside the command's scope,
+  preserve the source and identify the outstanding cleanup without claiming
+  a fully completed transfer.
 
-- Derive approved phase/story groups from spec, plan, research and pending
-  decisions. Preserve native IDs, syntax, ordering and approval gates.
-- Write only approved native tasks; verify saved meaning. Do not create a pending
-  section in tasks or erase spec/plan/research entries; report pending cleanup.
-- Label out-of-scope product/design decisions unpersisted. Recommend a separate
-  authorized clarify/plan workflow; do not invoke it or claim omitted decisions saved.
+### Decision Handoff — `tasks` responsibilities
+
+- Prior to Discovery/group approvals, inspect canonical spec/plan/research
+  decisions and any `## Pending Handoffs` in them. Do not re-ask a design or
+  requirement choice already approved in `specify`, `clarify` or `plan`.
+- Carry decisions targeted at `speckit.tasks` into the normal approved
+  phase/user-story work breakdown and standard `tasks.md` at its **existing
+  final write gate**. Verify resulting tasks reflect approved meaning; avoid
+  reintroducing an already satisfied task or inventing new architecture.
+- Native `tasks` cannot delete pending entries in `spec.md`/`plan.md`.
+  Preserve such sources and disclose **cleanup pending** where applicable;
+  do not claim verified removal, bypass the source permissions, or add a
+  second approval just to reuse the decision.

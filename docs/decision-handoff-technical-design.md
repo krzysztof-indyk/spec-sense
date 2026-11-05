@@ -1,7 +1,7 @@
 # SpecSense v0.6.0 — Decision Handoff Technical Design
 
-**Status:** Technical design updated — cleanup Option A approved on 2026-11-03; implementation approval still required  
-**Implementation:** Not started  
+**Status:** Approved design; instruction-level implementation packaged in v0.6.0; live Copilot acceptance pending  
+**Implementation:** Eight preset wrappers updated; core scripts/templates unchanged  
 **Inputs:** `decision-handoff-requirements.md`, SpecSense v0.5.4, standard Spec Kit command definitions
 
 ## 1. Integration principle
@@ -112,7 +112,7 @@ This is a **documented exception to the default write scope of `plan`**, not a c
 6. **No hidden automatic transitions.** Do not invoke `clarify`, `plan`, `tasks`, or implementation automatically, preserving existing approval gates.
 7. **Model-only enforcement.** Instructions can lower error rate, but cannot provide strong transactional guarantees. Test with a real Copilot agent and report limitations without claiming deterministic success.
 
-## 7. Minimal proposed implementation steps (not executed)
+## 7. Minimal implementation steps (implemented as instructions)
 
 1. Add a compact shared handoff rules block to the wrappers or shared source text injected at packaging; maintain eight `wrap` contributions in `preset.yml`.
 2. Update `specify` and `clarify` to account for approved future-stage decisions at final write.
@@ -124,7 +124,7 @@ This is a **documented exception to the default write scope of `plan`**, not a c
 ## 8. Design approval and remaining implementation gate
 
 - **Resolved:** Source cleanup Option A approved on 2026-11-03 for `speckit.plan`, narrowly scoped as specified in §5.
-- **Still required before implementation:** explicit user approval to modify SpecSense wrappers/manifest or assemble the next release package. This document is design only.
-- **Implementation verification:** run the static and behavioral tests, including destination-before-source order, cross-feature protection, idempotent retry, and preservation of unrelated `spec.md` content.
+- **Implementation authorized:** the user explicitly requested implementation and packaging on 2026-11-03. The release contains instruction-level changes, not a deterministic file-operation engine.
+- **Implementation verification:** static checks should pass; behavioral tests for destination-before-source order, cross-feature protection, idempotent retry, and unrelated content preservation remain necessary in Copilot.
 - **Release artifact:** include the unchanged approved requirements summary and this updated design under `docs/` in the future v0.6.0 package, as already requested.
 

@@ -1,6 +1,6 @@
 # SpecSense v0.6.0 — Decision Handoff Test Plan
 
-**Status:** Updated for approved Option A (2026-11-03); no tests run against Copilot yet  
+**Status:** Included in v0.6.0; static checks planned, live Copilot acceptance tests pending  
 **Baseline:** SpecSense v0.5.4
 
 ## Static / package checks

@@ -72,61 +72,88 @@ outputs on disk after approval.
 
 ---
 
-## Decision Handoff — v0.6.0
+## SpecSense v0.6.0 — Decision Handoff (shared safety contract)
 
-- Use native active-feature resolution; never guess paths. Read relevant artifacts
-  and pending sections before asking. Classify decisions in memory: approved,
-  open, conflicting, later-stage or out-of-scope. Track source references.
-- Reuse approved decisions, including semantically equivalent wording. Do not
-  treat suggestions or defaults as approval. Reopen only missing details,
-  material contradictions or new risks; explain what changed.
-- Keep discovery read-only, including scripts/hooks. Preserve existing gates
-  and `--auto` limits. Require no additional handoff approval for unchanged
-  decisions; preview transfers in the existing final write summary.
-- Apply forward-only adoption: read historical artifacts, but do not migrate
-  old decisions. Add no registry, runtime, command or core template/script change.
-  Never auto-invoke another stage. Reading a source grants no write permission.
-- Re-read saved output; verify meaning, constraints and qualifiers. Account for
-  every new approved decision. Report persisted, pending or unpersisted status;
-  never claim complete persistence when missing or lose the only durable copy.
+This extends the **existing** Spec Kit command and the interactive policy above;
+it is not a new command, storage system or replacement for native scripts,
+templates, hooks, approval gates or artifact formats.
 
-### Transfer — approved Option A
+- **Read before asking:** use standard Spec Kit active-feature resolution and
+  permitted read-only prerequisites to inspect relevant `spec.md` (including
+  Clarifications), `research.md`, `plan.md`, `tasks.md`, constitution and any
+  existing `## Pending Handoffs`. An absent section is normal for older
+  features; **do not backfill** historical decisions. Use only current-feature
+  artifacts, never a guessed path or remembered chat as the sole authority.
+- **Ask only what is still open:** an explicit approved decision, even if
+  phrased differently, is already answered. Do not reconfirm it merely because
+  a new command or discovery phase began. Only ask about a missing material
+  detail, genuine contradiction or newly discovered risk; show the earlier
+  decision and the specific new information first. One focused question if
+  clarification is necessary; no mandatory question if nothing is missing.
+- **Approved versus proposed:** don't promote exploratory options, implicit
+  defaults, unaccepted recommendations or conversation-only risk discussions
+  into binding decisions. An approved requirement stays in its native section;
+  store only an approved *future-stage* decision temporarily, and only in a
+  document this command can normally write under its existing final approval.
+- **Temporary format:** when needed, use a single `## Pending Handoffs` section
+  in the current native artifact. One stable feature-unique ID per entry, e.g.
+  `- **DH-001 → speckit.plan / research.md** — Decision: Respect Retry-After on
+  HTTP 429, with an explicit cap. Approved during speckit.specify.` Preserve
+  the exact decision, qualifiers and target existing Spec Kit artifact. Do not
+  create a new decision file or change any core template. Do not add an empty
+  section. Avoid duplicate entries if the target already contains the decision.
+- **Persistence gate:** collect approvals in chat during Discovery. At the
+  command's existing **final approved write** only, persist approved
+  current-stage decisions canonically and eligible future-stage decisions as
+  pending entries; then re-read and verify coverage before reporting success.
+  Never run write-capable tools early. Preview incoming/outgoing handoffs in
+  the existing approval summary; do not demand another approval for a decision
+  already accepted. Existing `--auto` does not cancel safety/write gates.
+- **Transfer rule:** consume incoming decisions when the target command runs,
+  verify the *full meaning and qualifiers* in the native target after its
+  authorized write, and only then clean a source entry **if that command is
+  specifically allowed to edit that source**. On incomplete writes, missing
+  qualifiers, changed source or uncertain feature identity, preserve the
+  pending entry and report the incomplete handoff. Never delete permanent
+  product requirements or constraints. Do not silently retry or duplicate.
+- **Hard boundaries:** `speckit.analyze` is read-only; `speckit.converge`
+  remains append-only; `speckit.constitution` changes only its constitution;
+  custom checklist files remain append-only. The **only** approved bounded
+  cross-artifact cleanup exception is in `speckit.plan`, defined below. Other
+  commands may reuse pending decisions but cannot delete earlier-stage entries
+  by inventing new permissions. If cleanup is outside the command's scope,
+  preserve the source and identify the outstanding cleanup without claiming
+  a fully completed transfer.
 
-1. Retain resolved active-feature identity and source content. Select only
-   approved entries targeting `speckit.plan` and native planning outputs.
-   Reject ambiguous entries or duplicate IDs as cleanup candidates.
-2. Preview destinations and exact cleanup IDs in existing final plan approval.
-   Require that approval to cover cleanup; do not reapprove unchanged decisions.
-   Rejection means no writes. Recheck feature/source/target before writing;
-   stop affected work on material changes and explain the discrepancy.
-3. Save the full decision canonically in native planning output, normally
-   `research.md` or appropriate `plan.md`. Map source IDs to destination sections
-   in memory. Preserve qualifiers; run the standard workflow and hooks.
-4. RE-READ DESTINATION BEFORE SOURCE DELETION. Verify complete meaning, not
-   similar topics. On write/verification failure, keep the source and report
-   incomplete transfer. Only individually verified entries qualify for cleanup.
-5. Immediately before cleanup, re-resolve the feature and re-read `spec.md`.
-   Abort deletion if the feature switched, entries changed/disappeared, IDs
-   became ambiguous or source changed materially. Explain the conflict; ask
-   only about changed matters when necessary.
-6. Match by stable ID AND decision content. Remove only verified, approved,
-   plan-targeted entries from active `spec.md`. Preserve all other entries,
-   requirements, constraints, Clarifications and metadata byte-for-byte.
-   Remove the heading only if no pending content remains. Edit no other source.
-7. Re-read source AND destination. Verify decisions remain at the destination,
-   only selected entries disappeared and unrelated content is intact. On failure,
-   keep verified output and original pending entries; report incomplete cleanup.
-   Reinspect interrupted/uncertain writes; never assume success.
-8. Retry idempotently: verify existing destination decisions, then attempt only
-   eligible cleanup. Do not duplicate/overwrite decisions. Preserve the source
-   whenever a precondition is uncertain.
+### Decision Handoff — `plan` responsibilities and approved bounded cleanup
 
-### New decisions
-
-- At final approved writing, save current decisions canonically. Put genuinely
-  later-stage decisions in one `## Pending Handoffs` section of `plan.md` with
-  stable feature ID, approved meaning/provenance and native command/artifact
-  target. Check existing IDs; never recycle an unfinished ID. Verify persistence.
-- Keep pending entries out of tasks/checklists. Allow later stages to read
-  `plan.md`; grant no later-stage cross-artifact cleanup permission. Retain entries
-  and report pending cleanup. Do not extend the active-spec-to-plan exception.
+1. In read-only preflight, resolve the **active feature** via standard Spec Kit
+   mechanisms. Read `spec.md` including approved `## Pending Handoffs`, and
+   existing `research.md`/`plan.md` if present. Treat entries targeting
+   `speckit.plan` as inputs to design, not unanswered questions. Include a
+   concise list of decisions being carried into the **existing** final plan
+   approval preview. Do not change `spec.md` during preflight.
+2. At the **approved native planning write**, record each applicable decision
+   with all qualifiers in the standard `research.md` (or `plan.md` if
+   canonically appropriate). Keep normal design reasoning and constitution
+   checks; if a real conflict appears, cite it and ask only about that delta.
+3. **Verify before cleanup:** re-read the destination, ensure the exact meaning,
+   constraints and caveats of each entry are present; topic overlap alone is
+   insufficient. If absent or ambiguous, preserve the source and report failure.
+   On retry, reuse and verify existing matching target content; never duplicate
+   it. Re-read active feature identity and original `spec.md` immediately before
+   cleanup; if either changed materially, abort deletion and report the conflict.
+4. **Approved narrowly scoped exception (Option A):** as part of the already
+   approved plan write, and **only after successful destination verification**,
+   remove exactly the verified `speckit.plan`-targeted `DH-...` entries from the
+   active feature's `spec.md` `## Pending Handoffs`, matched by both stable ID
+   and unchanged original content. Preserve every other entry, canonical
+   requirement, constraint, Clarifications section and all unrelated text.
+   Remove the temporary heading only when empty. Never edit another feature's
+   spec or a non-pending paragraph; never delete an entry targeting `tasks`.
+5. Re-read both files after cleanup. If removal fails, keep the valid target
+   and the source entry, report **partial transfer / cleanup pending**, and
+   do not claim full completion. On retry, verify target and try only the
+   matching cleanup. No separate approval for unchanged approved decisions;
+   this exception is included in the normal plan write consent. Do not grant
+   this cleanup authority to any other command.
