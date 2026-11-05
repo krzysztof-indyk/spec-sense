@@ -1,4 +1,4 @@
-# SpecSense v0.6.1 — Standard Spec Kit + GitHub Copilot
+# SpecSense — Standard Spec Kit + GitHub Copilot
 
 **Unofficial** Spec Kit preset inspired by [sermakarevich/sddw](https://github.com/sermakarevich/sddw).
 It adapts **how Spec Kit collaborates with the user**; it does **not** replace Spec Kit's standard process, templates, scripts, or artifact formats. No Lean dependency.
@@ -32,12 +32,6 @@ artifact structure.
 
 > **Your project. Your decisions. Spec Kit asks before it assumes.**
 
-## Project naming
-
-- **SpecSense** is the product name used in documentation and public-facing messaging.
-- **`spec-sense`** is the repository name, source directory, archive prefix, and Spec Kit preset ID (`preset.id`).
-- The native `speckit.*` command names stay unchanged for compatibility with standard Spec Kit.
-
 ## Release notes
 
 **v0.6.1 — fewer redundant prompts:** Existing native Copilot decisions stay;
@@ -55,11 +49,6 @@ The **only** cross-artifact cleanup exception is `speckit.plan`: after fully
 verifying an incoming plan-targeted decision in native `research.md`/`plan.md`,
 it may remove precisely that unchanged pending entry from the active feature's
 `spec.md`. Other commands retain their read-only/append-only/write scopes.
-
-This is an **LLM-instruction implementation**, not a transactional runtime.
-Static package checks are included. The 27 live Copilot tests in
-[Decision Handoff Test Plan](docs/decision-handoff-test-plan.md) must still
-be performed before claiming end-to-end acceptance.
 
 **v0.5.4 — naming consistency:** renamed the source/archive root and preset ID
 from the historical unhyphenated identifier to **`spec-sense`**, while keeping
@@ -181,55 +170,12 @@ The built-in `checklists/requirements.md` from specify/clarify has a distinct li
 
 ## Install / upgrade
 
-Unzip the archive to get a **`spec-sense/`** directory containing `preset.yml`.
-In an initialized Spec Kit project configured for GitHub Copilot:
-
-```bash
-specify preset list
-# New installation (or after uninstalling an older version):
-specify preset add --dev /absolute/path/to/spec-sense --priority 5
-specify preset list
-```
-
-**Migration from v0.5.3 or earlier:** the previous releases used a different,
-unhyphenated preset ID (`specsense`). Remove that **legacy ID** first:
-
-```bash
-specify preset list
-specify preset remove specsense  # Only if listed: legacy versions <= v0.5.3
-specify preset add --dev /absolute/path/to/spec-sense --priority 5
-```
-
-For subsequent upgrades of v0.5.4+ (once `spec-sense` is installed), use:
-
 ```bash
 specify preset remove spec-sense
-specify preset add --dev /absolute/path/to/spec-sense --priority 5
+# New installation (or after uninstalling an older version):
+specify preset add --from https://github.com/krzysztof-indyk/spec-sense/archive/refs/heads/main.zip --priority 5
+specify preset list
 ```
-
-Do not leave the legacy preset installed alongside `spec-sense`: both wrap the
-same eight commands. Removing a preset does **not** delete previously generated
-feature documents. Consult `specify preset list` before any `remove` command.
-
-Verify all eight commands (note that Copilot may display skills as `/speckit-*`):
-
-```bash
-specify preset resolve speckit.specify
-specify preset resolve speckit.clarify
-specify preset resolve speckit.plan
-specify preset resolve speckit.tasks
-specify preset resolve speckit.constitution
-specify preset resolve speckit.converge
-specify preset resolve speckit.analyze
-specify preset resolve speckit.checklist
-```
-
-If resolution uses a project-local override or another preset, investigate the
-priority stack rather than assuming SDDW is active. Inspect generated
-`.github/skills/` or `.github/agents/` commands for the standard core metadata
-**plus** this interactive policy and no literal `{CORE_TEMPLATE}` text.
-After installation, start a **new Copilot chat** to reduce the chance of stale
-instruction context from an earlier conversation.
 
 ## Why a `wrap` preset?
 
@@ -264,16 +210,6 @@ python3 /absolute/path/to/spec-sense/verify_package.py \
 test plan adds 27 scenarios. Agent behavior cannot be proven statically. The offline validator parses YAML (when PyYAML is installed), checks
 all wrapper files, checks preservation of original v0.5.4 wrapper content, validates per-command
 Decision Handoff policy markers and simulates `{CORE_TEMPLATE}` composition. This is **not** an end-to-end Copilot test.
-
-## Rollback
-
-```bash
-specify preset remove spec-sense
-```
-
-Then reinstall the known-good **v0.5.4** package using `--dev` (same
-`spec-sense` preset ID). Removing the preset does not undo feature-document
-edits from prior runs; restore those through version control if necessary.
 
 ## References
 
