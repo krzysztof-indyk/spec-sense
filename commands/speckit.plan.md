@@ -51,17 +51,29 @@ make unsupported architecture decisions, follow this interactive gate first.
 
 ### Confirm & Generate
 
-- Show a concise architecture decision summary: chosen approach, integration points,
-  significant trade-offs, testing/rollback and any outstanding blockers.
-- Ask one explicit final question: "Generate the standard Spec Kit technical plan now?"
+- Show a concise architecture decision summary: chosen approach,
+  integration points, significant trade-offs, testing/rollback
+  and any outstanding blockers.
+- Ask exactly one final confirmation question:
+  "Generate the standard Spec Kit technical plan now?"
   STOP. Section approvals are **not** final file-write approval.
-- If approved, resume the **entire normal base planning flow**: required extension
-  hooks, setup script, standard plan template, research/design artifacts as needed,
-  constitution gates, agent-context updates and final handoffs.
-- Only document technical decisions supported by code or user confirmation. Do not
-  silently substitute the base command's defaults for user-rejected choices.
-- If existing plan/design files will be overwritten, explicitly identify this and
-  request approval to replace them before writing.
+- Use a single decision question. Do not add separate
+  "Change", "Comment", "Other" or optional free-text
+  questions/tabs. Users can provide changes through the
+  normal conversation if needed.
+- If existing plan/design files will be overwritten,
+  identify them within the same final confirmation question.
+  Do not create a separate approval prompt.
+
+- If approved, resume the **entire normal base planning flow**:
+  required extension hooks, setup script, standard plan
+  template, research/design artifacts as needed,
+  constitution gates, agent-context updates and final
+  handoffs.
+- Only document technical decisions supported by code or
+  user confirmation. Do not silently substitute the base
+  command's defaults for user-rejected choices.
+
 - Do not trigger `speckit.tasks` or `implement` automatically.
 
 ### Communication
